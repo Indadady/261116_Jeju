@@ -4,7 +4,8 @@
 |------|--------|---------|
 | hero.jpg | [Commons: File:Saeyeon-gyo.jpg](https://commons.wikimedia.org/wiki/File:Saeyeon-gyo.jpg) | CC BY-SA |
 | og-thumb.jpg | [Commons: File:Seongsan Ilchulbong from the air.jpg](https://commons.wikimedia.org/wiki/File:Seongsan_Ilchulbong_from_the_air.jpg) | CC BY-SA 2.0 |
-| hotel.jpg | Jeju landscape placeholder (호텔명 추후 안내) — [Saeyeon-gyo.jpg](https://commons.wikimedia.org/wiki/File:Saeyeon-gyo.jpg) | CC BY-SA |
+| hotel-exterior.jpg | Hotel Air City Jeju 전경 — [aircity.jejucityhotel.com](https://aircity.jejucityhotel.com/en/) | 호텔 안내 사진 |
+| hotel-room.jpg | Hotel Air City Jeju 2인실 — [aircity.jejucityhotel.com](https://aircity.jejucityhotel.com/en/) | 호텔 안내 사진 |
 | day1-dongmun.jpg | [Commons: File:Jeju Dongmun Traditional Market 01.jpg](https://commons.wikimedia.org/wiki/File:Jeju_Dongmun_Traditional_Market_01.jpg) | CC BY-SA |
 | day1-arboretum.jpg | [Commons: Yeongsil Trail / Hallasan](https://commons.wikimedia.org/wiki/File:Wooden_staircase_along_Yeongsil_Trail_with_the_mountains_of_Hallasan_Park_Jeju_Island_South_Korea.jpg) | CC BY-SA |
 | day2-tangerine.jpg | [Commons: File:KOCIS Trip to Jeju Island and Seoul (6279202476).jpg](https://commons.wikimedia.org/wiki/File:KOCIS_Trip_to_Jeju_Island_and_Seoul_(6279202476).jpg) | KOGL / public cultural |
