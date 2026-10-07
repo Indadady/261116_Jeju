@@ -305,9 +305,6 @@
             </div>
             <div class="max-w-5xl mx-auto border border-slate-200 rounded-2xl p-1 shadow-lg bg-white relative z-0">
                 <div id="map"></div>
-                <div id="map-status" class="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow font-bold text-xs text-slate-700 pointer-events-none max-w-[58%]">
-                    <i class="fa-solid fa-route text-indigo-500 mr-1"></i><span id="map-status-text">실제 도로 동선</span>
-                </div>
                 <div id="map-distance" class="hidden absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow pointer-events-none text-right">
                     <p class="text-[10px] font-bold text-slate-400 tracking-wide">대략 이동</p>
                     <p id="map-distance-leg" class="font-bold text-xs text-slate-800 leading-snug mt-0.5"></p>
@@ -1135,10 +1132,6 @@
             }
         };
         function isMobileView() { return window.matchMedia('(max-width: 768px)').matches; }
-        function setMapStatus(text) {
-            const el = document.getElementById('map-status-text');
-            if (el) el.textContent = text;
-        }
         function pathMeters(path) {
             let total = 0;
             for (let i = 1; i < path.length; i++) total += L.latLng(path[i - 1]).distanceTo(L.latLng(path[i]));
@@ -1319,7 +1312,6 @@
             const hint = mapHints[routeKey] || '';
             const hintEl = document.getElementById('map-hint');
             if (hintEl) hintEl.textContent = hint;
-            setMapStatus('실제 도로 동선을 불러오는 중...');
             setMapDistance('', '', 0, 0);
             const bounds = L.latLngBounds(routeData.points.map(key => spots[key].coords));
             currentMap.fitBounds(bounds, { padding: [50, 50], maxZoom: routeData.maxZoom || 11 });
@@ -1368,7 +1360,6 @@
                 const path = packed[i].path;
                 const meters = packed[i].meters || pathMeters(path);
                 const seconds = packed[i].seconds || estimateSeconds(meters, leg.mode);
-                setMapStatus(`${spots[leg.from].title} → ${spots[leg.to].title}`);
                 setMapDistance(leg.from, leg.to, meters, seconds, leg.mode);
                 const poly = L.polyline(path, {
                     color: leg.color, weight: leg.mode === 'air' ? 3 : 5, opacity: 0.95,
@@ -1384,7 +1375,6 @@
                 await new Promise(r => setTimeout(r, isMobileView() ? 280 : 140));
             }
             if (seq !== mapDrawSeq) return;
-            setMapStatus(hint);
             if (bus && currentMap.hasLayer(bus)) currentMap.removeLayer(bus);
             mapLayers = mapLayers.filter(layer => layer !== bus);
             if (activeBus === bus) activeBus = null;
