@@ -63,6 +63,7 @@
             transform-origin: center center;
             display: inline-block;
         }
+        #map-distance { min-width: 7.75rem; max-width: 10.5rem; }
         @media (max-width: 768px) { #map { height: 440px; } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -304,8 +305,14 @@
             </div>
             <div class="max-w-5xl mx-auto border border-slate-200 rounded-2xl p-1 shadow-lg bg-white relative z-0">
                 <div id="map"></div>
-                <div id="map-status" class="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow font-bold text-xs text-slate-700 pointer-events-none">
+                <div id="map-status" class="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow font-bold text-xs text-slate-700 pointer-events-none max-w-[58%]">
                     <i class="fa-solid fa-route text-indigo-500 mr-1"></i><span id="map-status-text">실제 도로 동선</span>
+                </div>
+                <div id="map-distance" class="hidden absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow pointer-events-none text-right">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wide">대략 이동</p>
+                    <p id="map-distance-leg" class="font-bold text-xs text-slate-800 leading-snug mt-0.5"></p>
+                    <p id="map-distance-time" class="font-black text-sm text-indigo-600 mt-0.5"></p>
+                    <p id="map-distance-km" class="text-[10px] font-bold text-slate-500 mt-0.5"></p>
                 </div>
             </div>
         </div>
@@ -1132,6 +1139,59 @@
             const el = document.getElementById('map-status-text');
             if (el) el.textContent = text;
         }
+        function pathMeters(path) {
+            let total = 0;
+            for (let i = 1; i < path.length; i++) total += L.latLng(path[i - 1]).distanceTo(L.latLng(path[i]));
+            return total;
+        }
+        function formatApproxKm(meters) {
+            if (!meters || meters <= 0) return '';
+            if (meters < 800) return '약 ' + Math.round(meters / 100) * 100 + 'm';
+            const km = meters / 1000;
+            if (km < 10) return '약 ' + (Math.round(km * 2) / 2) + 'km';
+            if (km < 50) return '약 ' + Math.round(km) + 'km';
+            if (km < 400) return '약 ' + Math.round(km / 5) * 5 + 'km';
+            return '약 ' + Math.round(km / 50) * 50 + 'km';
+        }
+        function estimateSeconds(meters, mode) {
+            if (!meters || meters <= 0) return 0;
+            if (mode === 'air') return meters / (800 / 3.6);
+            return meters / (25 / 3.6);
+        }
+        function groupTravelSeconds(seconds, mode) {
+            if (!seconds || seconds <= 0) return 0;
+            if (mode === 'air') return seconds;
+            // 단체버스: 승하차·인원 점검·여유를 반영해 내비게이션보다 넉넉히
+            return Math.max(12 * 60, seconds * 1.4 + 10 * 60);
+        }
+        function formatApproxTime(seconds) {
+            if (!seconds || seconds <= 0) return '';
+            const min = Math.max(1, Math.ceil(seconds / 60));
+            if (min < 55) return '약 ' + Math.max(15, Math.ceil(min / 5) * 5) + '분';
+            const rounded = Math.ceil(min / 10) * 10;
+            const h = Math.floor(rounded / 60);
+            const m = rounded % 60;
+            if (!h) return '약 ' + m + '분';
+            if (!m) return '약 ' + h + '시간';
+            return '약 ' + h + '시간 ' + m + '분';
+        }
+        function setMapDistance(fromKey, toKey, meters, seconds, mode) {
+            const box = document.getElementById('map-distance');
+            const legEl = document.getElementById('map-distance-leg');
+            const timeEl = document.getElementById('map-distance-time');
+            const kmEl = document.getElementById('map-distance-km');
+            if (!box || !legEl || !timeEl || !kmEl) return;
+            const kmLabel = formatApproxKm(meters);
+            const timeLabel = formatApproxTime(groupTravelSeconds(seconds, mode));
+            if (!fromKey || (!kmLabel && !timeLabel)) {
+                box.classList.add('hidden');
+                return;
+            }
+            box.classList.remove('hidden');
+            legEl.textContent = spots[fromKey].title + ' → ' + spots[toKey].title;
+            timeEl.textContent = timeLabel;
+            kmEl.textContent = kmLabel;
+        }
         function pinIcon(spot) {
             return L.divIcon({
                 className: 'custom-icon',
@@ -1175,11 +1235,13 @@
                 const data = await res.json();
                 if (data.code === 'Ok' && data.routes && data.routes[0]) {
                     const path = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-                    osrmCache[key] = path;
-                    return path;
+                    const packed = { path, meters: data.routes[0].distance, seconds: data.routes[0].duration };
+                    osrmCache[key] = packed;
+                    return packed;
                 }
             } catch (e) { /* straight fallback */ }
-            return pts;
+            const meters = pathMeters(pts);
+            return { path: pts, meters, seconds: estimateSeconds(meters, 'drive') };
         }
         function lineDuration(pixelLength, routeKey) {
             const mobile = isMobileView();
@@ -1258,6 +1320,7 @@
             const hintEl = document.getElementById('map-hint');
             if (hintEl) hintEl.textContent = hint;
             setMapStatus('실제 도로 동선을 불러오는 중...');
+            setMapDistance('', '', 0, 0);
             const bounds = L.latLngBounds(routeData.points.map(key => spots[key].coords));
             currentMap.fitBounds(bounds, { padding: [50, 50], maxZoom: routeData.maxZoom || 11 });
             setTimeout(() => currentMap.invalidateSize(), 120);
@@ -1267,16 +1330,20 @@
                     legs.push({ from: lineDef.pts[i], to: lineDef.pts[i + 1], color: lineDef.color, mode: lineDef.mode || 'drive' });
                 }
             });
-            const paths = await Promise.all(legs.map(leg => {
-                if (leg.mode === 'air') return Promise.resolve([spots[leg.from].coords, spots[leg.to].coords]);
+            const packed = await Promise.all(legs.map(async leg => {
+                if (leg.mode === 'air') {
+                    const path = [spots[leg.from].coords, spots[leg.to].coords];
+                    const meters = pathMeters(path);
+                    return { path, meters, seconds: estimateSeconds(meters, 'air') };
+                }
                 return roadPath([spots[leg.from].coords, spots[leg.to].coords]);
             }));
             if (seq !== mapDrawSeq) return;
-            paths.forEach(path => path.forEach(pt => bounds.extend(pt)));
+            packed.forEach(item => item.path.forEach(pt => bounds.extend(pt)));
             currentMap.fitBounds(bounds, { padding: [50, 50], maxZoom: routeData.maxZoom || 11 });
             await new Promise(r => setTimeout(r, 280));
             if (seq !== mapDrawSeq) return;
-            const ghost = L.polyline(paths.flat(), { color: '#94a3b8', weight: 4, opacity: 0.22, lineJoin: 'round', lineCap: 'round' }).addTo(currentMap);
+            const ghost = L.polyline(packed.map(item => item.path).flat(), { color: '#94a3b8', weight: 4, opacity: 0.22, lineJoin: 'round', lineCap: 'round' }).addTo(currentMap);
             mapLayers.push(ghost);
             const placed = new Set();
             const addPin = (key) => {
@@ -1298,8 +1365,11 @@
             for (let i = 0; i < legs.length; i++) {
                 if (seq !== mapDrawSeq) return;
                 const leg = legs[i];
-                const path = paths[i];
+                const path = packed[i].path;
+                const meters = packed[i].meters || pathMeters(path);
+                const seconds = packed[i].seconds || estimateSeconds(meters, leg.mode);
                 setMapStatus(`${spots[leg.from].title} → ${spots[leg.to].title}`);
+                setMapDistance(leg.from, leg.to, meters, seconds, leg.mode);
                 const poly = L.polyline(path, {
                     color: leg.color, weight: leg.mode === 'air' ? 3 : 5, opacity: 0.95,
                     dashArray: leg.mode === 'air' ? '10 8' : null,
@@ -1323,7 +1393,8 @@
         function initMap(initialKey) {
             if (mapInited || !window.L) return;
             mapInited = true;
-            currentMap = L.map('map', { scrollWheelZoom: false });
+            currentMap = L.map('map', { scrollWheelZoom: false, zoomControl: false });
+            L.control.zoom({ position: 'bottomleft' }).addTo(currentMap);
             if (typeof L.maplibreGL === 'function') {
                 L.maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron' }).addTo(currentMap);
             } else {
