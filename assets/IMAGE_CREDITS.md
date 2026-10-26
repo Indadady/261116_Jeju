@@ -14,7 +14,8 @@
 | day3-43.jpg | [Commons: File:Jeju 4.3 Peace Park - Memorial Hall.jpg](https://commons.wikimedia.org/wiki/File:Jeju_4.3_Peace_Park_-_Memorial_Hall.jpg) | CC BY-SA |
 
 ## 2026-10-07 PDF 일정 반영 추가
-- day1-fantasyforest.jpg — 환상숲 (기존 day2 자산 재사용)
+- day1-arboretum.jpg — 1일차 한라수목원·족욕 (환상숲 대체)
+- day1-fantasyforest.jpg — 이전 환상숲 일정용 (화면에서 미사용)
 - day2-dongmun.jpg — 동문시장 (기존 day1 자산 재사용)
 - day2-skywatershow.jpg — Musical Fountain, Sentosa (Wikimedia Commons, CC) — 스카이워터쇼 시각 대체
 - guidebook-qr.png — 가이드북 URL QR
