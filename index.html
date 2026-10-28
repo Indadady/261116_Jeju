@@ -98,7 +98,7 @@
             body { background-color: #ffffff !important; font-size: 10pt; color: #1e293b !important; }
             a[href]:after { content: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .print-hidden, .print\:hidden { display: none !important; }
+            .print-hidden, .print\:hidden, .no-print, #tm-inquiry-modal { display: none !important; }
             #print-area { display: block !important; width: 100%; color: #1e293b; font-family: 'Noto Sans KR', sans-serif; }
             .print-page-container { width: 100%; margin: 0; padding: 0; }
             .print-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #004098; padding-bottom: 8px; margin-bottom: 15px; }
@@ -650,11 +650,16 @@
                         <p class="leading-relaxed">늦가을 제주는 낮에도 바람이 있습니다. <strong>바람막이·가디건</strong>을 꼭 챙겨 주세요.</p>
                     </div>
                 </div>
-                <div class="bg-green-50/50 p-4 sm:p-6 rounded-2xl border border-green-100 shadow-sm">
-                    <h3 class="font-bold text-green-900 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-leaf text-green-500 shrink-0"></i>
-                        <span>ESG 실천 대시보드</span>
-                    </h3>
+                <div id="esg" class="bg-green-50/50 p-4 sm:p-6 rounded-2xl border border-green-100 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4">
+                        <h3 class="font-bold text-green-900 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-leaf text-green-500 shrink-0"></i>
+                            <span>ESG 실천 대시보드</span>
+                        </h3>
+                        <span id="tm-view-count" class="inline-flex items-center gap-1.5 bg-white text-slate-600 text-[11px] sm:text-xs font-bold px-3 py-1 rounded-full border border-green-200 shadow-sm">
+                            📊 실시간 가이드북 열람 : <strong class="tm-view-count-val text-[#004098]">...</strong>회
+                        </span>
+                    </div>
                     <div class="grid grid-cols-3 gap-1.5 sm:gap-3 text-center mb-3 sm:mb-4">
                         <div class="bg-white p-2.5 sm:p-3 rounded-xl shadow-sm border border-green-100 min-w-0">
                             <i class="fa-solid fa-tree text-green-500 text-base sm:text-xl mb-1"></i>
@@ -678,18 +683,102 @@
         </div>
     </section>
 
-    <footer style="background-color: #f8f9fa;" class="py-12 border-t border-slate-200">
-        <div class="container mx-auto px-4 text-center">
-            <a href="http://tourmaker.kr" target="_blank" rel="noopener" class="inline-block bg-white border border-slate-300 rounded-xl px-6 py-3 hover:shadow-md mb-6">
-                <div class="flex items-center gap-3">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker" class="h-6">
-                    <span class="text-sm font-bold text-slate-700">홈페이지 바로가기</span>
+    <footer style="background-color: #f8f9fa;" class="py-12 border-t border-slate-200 no-print">
+        <div class="container mx-auto px-4 text-center max-w-3xl">
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-md mb-8 text-left md:text-center">
+                <div class="flex flex-wrap items-center justify-between md:justify-center gap-2 mb-3">
+                    <span class="inline-flex items-center gap-1.5 bg-blue-50 text-[#004098] text-xs font-extrabold px-3 py-1 rounded-full border border-blue-200">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> TOURMAKER SMART GUIDEBOOK
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-eye text-[#004098]"></i> 📊 실시간 가이드북 열람 : <strong class="tm-view-count-val text-[#004098]">...</strong>회
+                    </span>
                 </div>
-            </a>
+                <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mb-1.5">우리 모임 · 학교 · 기관도 스마트 가이드북으로 여행 준비하기</h3>
+                <p class="text-xs md:text-sm text-slate-500 leading-relaxed mb-5">맞춤 일정표, 실시간 도로 동선 지도, 체크리스트까지 디지털로 지원합니다.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" onclick="openTmInquiryModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#004098] hover:bg-[#002d6b] text-white font-bold px-6 py-3.5 rounded-2xl shadow-md transition active:scale-95 text-sm">
+                        <i class="fa-solid fa-comments"></i> 투어메이커 맞춤 견적 · 상담 문의
+                    </button>
+                    <a href="https://tourmaker.kr/?utm_source=smart_guidebook&amp;utm_medium=footer_btn&amp;utm_campaign=261116_Jeju" target="_blank" rel="noopener" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-5 py-3.5 rounded-2xl border border-slate-200 transition text-sm">
+                        공식 홈페이지 <i class="fa-solid fa-chevron-right text-xs ml-0.5"></i>
+                    </a>
+                </div>
+            </div>
             <p class="text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed mb-6">[System Powered by TOURMAKER] 본 스마트 가이드북은 <strong>정선군 번영연합회</strong> 선진지견학 일정 안내와 <a href="http://tourmaker.kr" target="_blank" rel="noopener" class="font-bold underline">투어메이커</a>의 트래블 테크 기술 제휴로 제작되었습니다.</p>
             <p class="text-[10px] text-slate-400">&copy; 2026 Tourmaker Inc. All rights reserved.</p>
         </div>
     </footer>
+    </div>
+
+    <div id="tm-inquiry-modal" class="fixed inset-0 z-[120] hidden items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-0 sm:px-4 no-print" onclick="closeTmInquiryModal()">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-100" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#004098] to-[#002d6b] p-5 text-white flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold tracking-widest uppercase text-sky-200 block">TOURMAKER CONSULTING DESK</span>
+                    <h3 class="font-bold text-lg mt-0.5">투어메이커 맞춤 여행 · 견적 문의</h3>
+                </div>
+                <button type="button" onclick="closeTmInquiryModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white" aria-label="닫기">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 bg-slate-50">
+                <a href="https://pf.kakao.com/_fxjxiQn/chat" target="_blank" rel="noopener" onclick="trackTmInquiry('kakao')" class="flex items-center justify-between p-4 rounded-2xl bg-[#FEE500] hover:brightness-95 text-slate-900 shadow-sm transition active:scale-[0.99]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-900/10 flex items-center justify-center text-xl font-black">💬</div>
+                        <div class="text-left">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="font-extrabold text-sm">카카오톡 비즈니스 1:1 상담</span>
+                                <span class="text-[10px] font-extrabold bg-rose-600 text-white px-2 py-0.5 rounded-full">가장 추천</span>
+                                <span class="text-[10px] font-extrabold bg-slate-900 text-[#FEE500] px-2 py-0.5 rounded-full">조혁 이사 전담</span>
+                            </div>
+                            <p class="text-xs text-slate-800/80 mt-0.5">가장 빠른 상담 · 조혁 이사가 희망 여행지·인원·일정을 바로 응대합니다</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-700 text-xs"></i>
+                </a>
+
+                <a id="tm-sms-inquiry-link" href="sms:010-4249-4026" onclick="trackTmInquiry('sms')" class="flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-sky-50 border border-sky-200 text-slate-800 shadow-sm transition active:scale-[0.99]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-lg"><i class="fa-solid fa-comment-sms"></i></div>
+                        <div class="text-left">
+                            <span class="font-extrabold text-sm block">10초 문자(SMS) 간편 견적 문의</span>
+                            <p class="text-xs text-slate-500 mt-0.5">조혁 이사(010-4249-4026)에게 문의 양식이 자동 입력됩니다</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+                </a>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <a href="tel:010-4249-4026" onclick="trackTmInquiry('call_jo')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-emerald-700">현장·카톡·견적</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">조혁 이사</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-emerald-600"></i>010-4249-4026</p>
+                    </a>
+                    <a href="tel:010-9443-7881" onclick="trackTmInquiry('call_lee')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-[#004098]">총괄·기획</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">이재명 대표</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-[#004098]"></i>010-9443-7881</p>
+                    </a>
+                    <a href="tel:033-562-2551" onclick="trackTmInquiry('call_office')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-slate-500">사무실</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">투어메이커</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-slate-500"></i>033-562-2551</p>
+                    </a>
+                </div>
+
+                <a href="https://tourmaker.kr/?utm_source=smart_guidebook&amp;utm_medium=inquiry_modal&amp;utm_campaign=261116_Jeju" target="_blank" rel="noopener" onclick="trackTmInquiry('website')" class="flex items-center justify-between p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-sm"><i class="fa-solid fa-globe text-sky-300"></i></div>
+                        <div class="text-left">
+                            <span class="font-bold text-sm block">투어메이커 공식 홈페이지 · 포트폴리오</span>
+                            <p class="text-[11px] text-slate-300 mt-0.5">tourmaker.kr · 대표전화 033-562-2551</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-300"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
     <div id="print-area" class="hidden print:block w-full bg-white text-black py-2">
@@ -1433,6 +1522,76 @@
         }, { threshold: 0.1 });
         const mapSection = document.getElementById('map-section');
         if (mapSection) io.observe(mapSection);
+
+        const TM_GUIDEBOOK_SLUG = '261116_Jeju';
+        const TM_GUIDEBOOK_NAME = '정선군 번영연합회 제주 선진지견학';
+        function openTmInquiryModal() {
+            const m = document.getElementById('tm-inquiry-modal');
+            if (!m) return;
+            const smsLink = document.getElementById('tm-sms-inquiry-link');
+            if (smsLink) {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const body = encodeURIComponent(`[${TM_GUIDEBOOK_NAME} 가이드북 보고 문의드립니다] 단체/모임명 / 희망지역 / 예상인원 / 출발시기 : `);
+                smsLink.href = `sms:010-4249-4026${isIOS ? '&' : '?'}body=${body}`;
+            }
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            trackTmInquiry('modal_open');
+        }
+        function closeTmInquiryModal() {
+            const m = document.getElementById('tm-inquiry-modal');
+            if (!m) return;
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+        function trackTmInquiry(action) {
+            try {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'tm_guidebook_inquiry', {
+                        event_category: 'lead',
+                        event_label: `${TM_GUIDEBOOK_SLUG}_${action}`
+                    });
+                }
+            } catch (e) {}
+        }
+        async function initTmViewCounter() {
+            const els = document.querySelectorAll('.tm-view-count-val');
+            if (!els.length) return;
+            const hitKey = 'tm_hit_' + TM_GUIDEBOOK_SLUG;
+            const cacheKey = 'tm_cnt_' + TM_GUIDEBOOK_SLUG;
+            const alreadyHit = sessionStorage.getItem(hitKey);
+            let count = null;
+            try {
+                const mode = alreadyHit ? 'get' : 'hit';
+                const res = await fetch(`https://abacus.jasoncameron.dev/${mode}/tourmaker.kr/${TM_GUIDEBOOK_SLUG}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data.value === 'number') {
+                        count = data.value;
+                        sessionStorage.setItem(hitKey, '1');
+                    }
+                }
+            } catch (e) {}
+            if (count === null || count === 0) {
+                try {
+                    const res2 = await fetch(`https://tally.yuki.sh/hits/tourmaker/${TM_GUIDEBOOK_SLUG}.json${alreadyHit ? '?mode=read' : ''}`);
+                    if (res2.ok) {
+                        const data2 = await res2.json();
+                        if (typeof data2.visit === 'number') {
+                            count = data2.visit;
+                            sessionStorage.setItem(hitKey, '1');
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (count !== null && count > 0) {
+                localStorage.setItem(cacheKey, String(count));
+            } else {
+                count = parseInt(localStorage.getItem(cacheKey) || '1', 10) || 1;
+            }
+            els.forEach(el => { el.textContent = count.toLocaleString(); });
+        }
+        initTmViewCounter();
     </script>
 </body>
 </html>
