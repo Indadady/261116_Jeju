@@ -634,7 +634,7 @@
         <div class="container mx-auto px-4">
             <div class="text-center mb-8 sm:mb-10">
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-800 font-title">날씨 정보 · ESG 실천</h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1 px-2">11월 제주는 일교차와 바람이 큽니다. 겹쳐 입을 겉옷을 준비해 주세요.</p>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 px-2">예보 기온·비·바람을 반영한 옷차림 추천을 함께 확인하세요.</p>
             </div>
             <div class="grid md:grid-cols-2 gap-5 sm:gap-8 max-w-6xl mx-auto">
                 <div class="bg-blue-50/50 p-4 sm:p-6 rounded-2xl border border-blue-100 shadow-sm">
@@ -645,9 +645,18 @@
                     <div id="weather-container" class="weather-grid">
                         <div class="text-sm text-slate-500 py-4 col-span-5 text-center">날씨 정보를 불러오는 중입니다...</div>
                     </div>
-                    <div class="mt-3 sm:mt-4 bg-white p-3 rounded-lg border border-blue-100 text-xs sm:text-sm text-slate-600 font-medium flex gap-2 items-start">
-                        <i class="fa-solid fa-shirt text-blue-500 mt-0.5 shrink-0"></i>
-                        <p class="leading-relaxed">늦가을 제주는 낮에도 바람이 있습니다. <strong>바람막이·가디건</strong>을 꼭 챙겨 주세요.</p>
+                    <div id="clothing-recommendation" class="mt-3 sm:mt-4 bg-white p-3.5 sm:p-4 rounded-xl border border-blue-100 text-xs sm:text-sm text-slate-700">
+                        <p class="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-shirt text-blue-500 shrink-0"></i>
+                            <span>날씨에 따른 추천 옷차림</span>
+                        </p>
+                        <p id="clothing-summary" class="leading-relaxed text-slate-600 mb-3">예보를 불러와 옷차림을 맞추는 중입니다…</p>
+                        <ul id="clothing-tips" class="space-y-1.5 text-slate-600 leading-relaxed">
+                            <li class="flex gap-2"><span class="text-blue-500 font-bold shrink-0">•</span><span><strong>겹쳐 입기</strong> — 낮·저녁 일교차에 대비해 긴팔 위에 벗기 쉬운 겉옷을 준비하세요.</span></li>
+                            <li class="flex gap-2"><span class="text-blue-500 font-bold shrink-0">•</span><span><strong>방풍 겉옷</strong> — 제주 해풍·수목원·에코랜드 야외 구간용 바람막이·가디건을 챙기세요.</span></li>
+                            <li class="flex gap-2"><span class="text-blue-500 font-bold shrink-0">•</span><span><strong>편한 운동화</strong> — 감귤따기·시장·기념관 등 걷는 일정이 있어 쿠션 좋은 신발이 좋습니다.</span></li>
+                            <li class="flex gap-2"><span class="text-blue-500 font-bold shrink-0">•</span><span><strong>우산·얇은 우비</strong> — 11월 제주는 비 소식이 잦을 수 있어요. 접이식 우산을 가방에 넣어 주세요.</span></li>
+                        </ul>
                     </div>
                 </div>
                 <div id="esg" class="bg-green-50/50 p-4 sm:p-6 rounded-2xl border border-green-100 shadow-sm">
@@ -1134,12 +1143,56 @@
             if(descEl) descEl.innerHTML = `스마트 가이드북 도입으로 참여 인원 기준 약 <strong>${trees}그루</strong>의 나무를 심는 효과를 기대할 수 있습니다.`;
         })();
 
+        function buildJejuClothingAdvice(avgMin, avgMax, maxRainProb, maxWind, rainyDays) {
+            const tips = [];
+            let summary = `앞으로 5일 제주는 평균 최저 <strong>${avgMin}°C</strong> ~ 최고 <strong>${avgMax}°C</strong>로 예보됩니다. `;
+
+            if (avgMax <= 12 || avgMin <= 6) {
+                summary += `초겨울에 가까운 쌀쌀한 기온입니다. <strong>니트·얇은 패딩·목도리</strong>를 챙기고, 야외에서는 방풍 겉옷을 꼭 입으세요.`;
+                tips.push('<strong>보온 레이어</strong> — 긴팔 이너 + 니트/후리스 + 패딩·두꺼운 바람막이 순으로 겹쳐 입으세요.');
+                tips.push('<strong>목·손 보온</strong> — 아침·저녁 이동과 공항 대기 때 목도리·장갑이 도움이 됩니다.');
+            } else if (avgMax <= 18) {
+                summary += `11월 제주 전형적인 늦가을 날씨입니다. 낮에는 긴팔·가디건, 저녁·야외에서는 <strong>바람막이·얇은 점퍼</strong>가 필요합니다.`;
+                tips.push('<strong>겹쳐 입기</strong> — 버스·실내는 따뜻하고 야외는 선선하니, 벗기 쉬운 겉옷을 준비하세요.');
+                tips.push('<strong>방풍 겉옷</strong> — 한라수목원·에코랜드·감귤따기 등 야외 구간용 바람막이·가디건을 챙기세요.');
+            } else if (avgMax <= 23) {
+                summary += `비교적 온화한 편입니다. 기본은 긴팔, 일교차와 해풍에 대비해 <strong>가벼운 겉옷</strong>만 있어도 충분합니다.`;
+                tips.push('<strong>가벼운 레이어</strong> — 긴팔 티·셔츠 위에 얇은 가디건·자켓을 준비하세요.');
+                tips.push('<strong>해풍 대비</strong> — 제주시는 낮에도 바람이 있어 얇은 바람막이가 있으면 편합니다.');
+            } else {
+                summary += `낮 기온이 다소 높습니다. 통풍되는 긴팔 중심으로 입고, 에어컨·저녁 한기에 <strong>얇은 겉옷</strong>을 챙기세요.`;
+                tips.push('<strong>통풍 옷차림</strong> — 면·린넨 느낌의 긴팔과 벗기 쉬운 겉옷을 준비하세요.');
+                tips.push('<strong>실내·실외 대비</strong> — 버스·회의실 냉방에 대비한 얇은 가디건이 유용합니다.');
+            }
+
+            if (maxRainProb >= 60 || rainyDays >= 2) {
+                tips.push(`<strong>우천 대비</strong> — 비 확률이 높은 날이 있어요. <strong>접이식 우산·얇은 우비</strong>와 젖어도 괜찮은 신발을 준비하세요.`);
+            } else if (maxRainProb >= 35) {
+                tips.push('<strong>소나기 대비</strong> — 가끔 비가 올 수 있으니 접이식 우산을 가방에 넣어 주세요.');
+            } else {
+                tips.push('<strong>만약을 위해</strong> — 비 확률은 낮지만, 접이식 우산 하나면 일정 중 안심입니다.');
+            }
+
+            if (maxWind >= 25) {
+                tips.push(`<strong>강한 바람</strong> — 최대 풍속 약 ${maxWind}km/h로 예보됩니다. 챙 모자보다 <strong>모자·후드·방풍 자켓</strong>이 낫고, 얇은 옷만 입으면 체감온도가 더 낮아집니다.`);
+            } else if (maxWind >= 18) {
+                tips.push('<strong>해풍·바람</strong> — 야외에서는 체감온도가 더 낮아질 수 있으니 방풍 겉옷을 꼭 챙기세요.');
+            }
+
+            tips.push('<strong>편한 운동화</strong> — 수목원·에코랜드·시장·기념관 등 걷는 일정이 많아 쿠션 좋은 신발이 좋습니다.');
+            tips.push('<strong>여분 양말</strong> — 비·이슬·감귤밭 이동 후 발이 젖을 수 있으니 여분 양말을 하나 넣어 주세요.');
+
+            return { summary, tips };
+        }
+
         async function fetchWeather() {
             const container = document.getElementById('weather-container');
+            const summaryEl = document.getElementById('clothing-summary');
+            const tipsEl = document.getElementById('clothing-tips');
             if(!container) return;
             try {
                 const lat = 33.4996, lon = 126.5312;
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia/Seoul&forecast_days=5`);
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Asia/Seoul&forecast_days=5`);
                 const data = await res.json();
                 const weatherCodes = {
                     0: ['☀️', '맑음'], 1: ['🌤️', '맑음'], 2: ['⛅', '구름'], 3: ['☁️', '흐림'],
@@ -1152,6 +1205,7 @@
                 };
                 let html = '';
                 const days = Math.min(5, data.daily.time.length);
+                let totalMax = 0, totalMin = 0, maxRainProb = 0, maxWind = 0, rainyDays = 0;
                 for (let i = 0; i < days; i++) {
                     const dateObj = new Date(data.daily.time[i] + 'T12:00:00');
                     const dayName = ['일','월','화','수','목','금','토'][dateObj.getDay()];
@@ -1160,6 +1214,13 @@
                     const code = data.daily.weathercode[i];
                     const maxT = Math.round(data.daily.temperature_2m_max[i]);
                     const minT = Math.round(data.daily.temperature_2m_min[i]);
+                    const rainProb = Math.round(data.daily.precipitation_probability_max?.[i] ?? 0);
+                    const wind = Math.round(data.daily.windspeed_10m_max?.[i] ?? 0);
+                    totalMax += maxT;
+                    totalMin += minT;
+                    if (rainProb > maxRainProb) maxRainProb = rainProb;
+                    if (wind > maxWind) maxWind = wind;
+                    if (rainProb >= 50 || [51,53,55,61,63,65,80,81,82,95,96,99].includes(code)) rainyDays += 1;
                     const [emoji, label] = weatherCodes[code] || ['☁️', '흐림'];
                     html += `<div class="weather-card bg-white px-1 py-2.5 sm:p-3 rounded-xl border border-blue-100 text-center">
                         <p class="text-[10px] sm:text-xs font-bold text-slate-500 leading-tight">${month}/${date}<br><span class="font-medium">(${dayName})</span></p>
@@ -1173,8 +1234,21 @@
                     </div>`;
                 }
                 container.innerHTML = html;
+
+                const avgMax = Math.round(totalMax / days);
+                const avgMin = Math.round(totalMin / days);
+                const advice = buildJejuClothingAdvice(avgMin, avgMax, maxRainProb, maxWind, rainyDays);
+                if (summaryEl) summaryEl.innerHTML = advice.summary;
+                if (tipsEl) {
+                    tipsEl.innerHTML = advice.tips.map(t =>
+                        `<li class="flex gap-2"><span class="text-blue-500 font-bold shrink-0">•</span><span>${t}</span></li>`
+                    ).join('');
+                }
             } catch (e) {
                 container.innerHTML = '<p class="text-sm text-red-500 col-span-5 text-center">날씨 정보를 불러오지 못했습니다.</p>';
+                if (summaryEl) {
+                    summaryEl.innerHTML = '11월 제주는 일교차와 해풍이 큽니다. <strong>긴팔 + 바람막이·가디건</strong> 겹쳐 입기를 권장합니다.';
+                }
             }
         }
         fetchWeather();
